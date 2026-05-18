@@ -28,13 +28,16 @@ app.add_middleware(
 jobs = {}
 
 # ── API KEY ──
-import secrets
-API_KEY = "ci-2026-ricardo-secret-key"  # Troque por uma chave sua
+from fastapi.security import APIKeyHeader
+from fastapi import Security
 
-def verificar_api_key(x_api_key: str = None):
-    if x_api_key is None or x_api_key != API_KEY:
-        return  # Sem autenticação por enquanto — reativar depois
-    return x_api_key
+API_KEY = "ci-2026-ricardo-secret-key"
+api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
+
+async def verificar_api_key(key: str = Security(api_key_header)):
+    if key != API_KEY:
+        raise HTTPException(status_code=401, detail="API Key inválida ou ausente")
+    return key
 
 UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
@@ -68,9 +71,9 @@ def health():
 async def analisar_carteira(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    x_api_key: str = None
+    api_key: str = Security(api_key_header)
 ):
-    verificar_api_key(x_api_key)
+    await verificar_api_key(api_key)
     """
     Recebe um arquivo Excel (.xlsx) com a carteira.
     Colunas esperadas: documento, valor_face, tipo_credito, meses_inadimplencia
@@ -172,8 +175,8 @@ def download_resultado(job_id: str):
 # ─────────────────────────────────────────────
 
 @app.post("/analisar-documento")
-def analisar_documento(body: dict, x_api_key: str = None):
-    verificar_api_key(x_api_key)
+async def analisar_documento(body: dict, api_key: str = Security(api_key_header)):
+    await verificar_api_key(api_key)
     """
     Analisa um único CPF ou CNPJ.
     Body: { "documento": "33000167000101", "valor_face": 150000,
