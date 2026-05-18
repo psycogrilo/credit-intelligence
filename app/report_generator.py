@@ -508,6 +508,30 @@ def gerar_relatorio_html(df: pd.DataFrame, job_id: str, cliente: str = "") -> st
   As estimativas contidas neste relatório são baseadas em modelos estatísticos, dados públicos disponíveis (Receita Federal via CNPJá, processos via Datajud/CNJ) e informações fornecidas pelo contratante. Não constituem garantia de retorno financeiro. A Credit Intelligence não se responsabiliza por decisões de investimento tomadas com base neste documento. Recomenda-se validação jurídica independente antes da aquisição. Gerado automaticamente em {data_hoje}.
 </div>
 
+<div style="position:fixed; bottom:32px; right:32px; z-index:1000; display:flex; gap:10px;">
+  <button onclick="window.print()" style="
+    background:var(--gold); color:var(--bg); border:none;
+    font-family:'Bebas Neue',sans-serif; font-size:16px;
+    letter-spacing:2px; padding:12px 24px; cursor:pointer;">
+    ⬇ SALVAR PDF
+  </button>
+  <button onclick="window.close()" style="
+    background:transparent; color:var(--text3); border:1px solid var(--border2);
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:2px; padding:12px 24px; cursor:pointer;">
+    FECHAR
+  </button>
+</div>
+
+<style>
+@media print {{
+  body {{ background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
+  div[style*="position:fixed"] {{ display:none !important; }}
+  .cover {{ page-break-after: always; min-height: auto; padding: 40px; }}
+  .section {{ page-break-inside: avoid; padding: 40px; }}
+}}
+</style>
+
 </body>
 </html>"""
 
