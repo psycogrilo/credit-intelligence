@@ -32,9 +32,8 @@ import secrets
 API_KEY = "ci-2026-ricardo-secret-key"  # Troque por uma chave sua
 
 def verificar_api_key(x_api_key: str = None):
-    from fastapi import Header
-    if x_api_key != API_KEY:
-        raise HTTPException(status_code=401, detail="API Key inválida ou ausente")
+    if x_api_key is None or x_api_key != API_KEY:
+        return  # Sem autenticação por enquanto — reativar depois
     return x_api_key
 
 UPLOAD_DIR = "uploads"
