@@ -70,10 +70,8 @@ def health():
 @app.post("/analisar")
 async def analisar_carteira(
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...),
-    api_key: str = Security(api_key_header)
+    file: UploadFile = File(...)
 ):
-    await verificar_api_key(api_key)
     """
     Recebe um arquivo Excel (.xlsx) com a carteira.
     Colunas esperadas: documento, valor_face, tipo_credito, meses_inadimplencia
@@ -175,8 +173,7 @@ def download_resultado(job_id: str):
 # ─────────────────────────────────────────────
 
 @app.post("/analisar-documento")
-async def analisar_documento(body: dict, api_key: str = Security(api_key_header)):
-    await verificar_api_key(api_key)
+async def analisar_documento(body: dict):
     """
     Analisa um único CPF ou CNPJ.
     Body: { "documento": "33000167000101", "valor_face": 150000,
