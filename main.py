@@ -27,6 +27,16 @@ app.add_middleware(
 # Em produção: usar Redis ou banco de dados
 jobs = {}
 
+# ── API KEY ──
+import secrets
+API_KEY = "ci-2026-ricardo-secret-key"  # Troque por uma chave sua
+
+def verificar_api_key(x_api_key: str = None):
+    from fastapi import Header
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="API Key inválida ou ausente")
+    return x_api_key
+
 UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -58,8 +68,10 @@ def health():
 @app.post("/analisar")
 async def analisar_carteira(
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    x_api_key: str = None
 ):
+    verificar_api_key(x_api_key)
     """
     Recebe um arquivo Excel (.xlsx) com a carteira.
     Colunas esperadas: documento, valor_face, tipo_credito, meses_inadimplencia
@@ -161,7 +173,8 @@ def download_resultado(job_id: str):
 # ─────────────────────────────────────────────
 
 @app.post("/analisar-documento")
-def analisar_documento(body: dict):
+def analisar_documento(body: dict, x_api_key: str = None):
+    verificar_api_key(x_api_key)
     """
     Analisa um único CPF ou CNPJ.
     Body: { "documento": "33000167000101", "valor_face": 150000,
