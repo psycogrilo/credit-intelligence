@@ -7,6 +7,7 @@ import os
 import json
 from datetime import datetime
 from app.enricher import processar_linha, detectar_tipo
+from app.report_generator import gerar_relatorio_html
 
 app = FastAPI(
     title="Credit Intelligence API",
@@ -201,6 +202,23 @@ def listar_jobs():
         ]
     }
 
+
+
+
+@app.get("/relatorio/{job_id}")
+def relatorio_html(job_id: str, cliente: str = ""):
+    from fastapi.responses import HTMLResponse
+    if job_id not in jobs:
+        raise HTTPException(404, "Job não encontrado")
+    job = jobs[job_id]
+    if job["status"] != "concluido":
+        raise HTTPException(400, f"Status: {job['status']}")
+    path = job["resultado_path"]
+    if not path or not os.path.exists(path):
+        raise HTTPException(404, "Arquivo não encontrado")
+    df = pd.read_excel(path)
+    html = gerar_relatorio_html(df, job_id, cliente)
+    return HTMLResponse(content=html, status_code=200)
 
 # ─────────────────────────────────────────────
 # PROCESSAMENTO EM BACKGROUND
